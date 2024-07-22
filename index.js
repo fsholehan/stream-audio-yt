@@ -13,15 +13,20 @@ app.get("/audio", (req, res) => {
     return res.status(400).send("Video URL is required");
   }
 
+  console.log(`Request for video URL: ${videoUrl}`);
+
   res.header("Content-Type", "audio/mpeg");
   ytdl(videoUrl, { filter: "audioonly" })
     .on("error", (err) => {
-      console.error("Error:", err);
+      console.error("Streaming error:", err);
       res.status(500).send("Error streaming audio");
     })
-    .pipe(res);
+    .pipe(res)
+    .on("finish", () => {
+      console.log("Streaming finished successfully");
+    });
 });
 
 app.listen(port, () => {
-  console.log(`Server running at port 3000`);
+  console.log(`Server running at http://localhost:${port}/`);
 });
