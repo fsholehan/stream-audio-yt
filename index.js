@@ -1,13 +1,14 @@
 const express = require("express");
 const ytdl = require("@distube/ytdl-core");
-const cors = require("cors"); // Import cors
+const cors = require("cors");
+const fs = require("fs");
 const app = express();
 const port = 3000;
 
-app.use(cors()); // Gunakan middleware cors
+app.use(cors());
 
 app.get("/audio", (req, res) => {
-  const videoUrl = req.query.url; // Ambil URL video dari parameter query
+  const videoUrl = req.query.url;
 
   if (!videoUrl) {
     return res.status(400).send("Video URL is required");
@@ -16,7 +17,7 @@ app.get("/audio", (req, res) => {
   console.log(`Request for video URL: ${videoUrl}`);
 
   res.header("Content-Type", "audio/mpeg");
-  ytdl(videoUrl, { filter: "audioonly" })
+  ytdl(videoUrl, { filter: "audioonly", highWaterMark: 1048576 / 4 })
     .on("error", (err) => {
       console.error("Streaming error:", err);
       res.status(500).send("Error streaming audio");
@@ -29,13 +30,16 @@ app.get("/audio", (req, res) => {
 
 app.get("/stream", (req, res) => {
   const videoUrl = "https://www.youtube.com/watch?v=toyIRrgV5U0";
-  const stream = ytdl(videoUrl, { filter: "audioonly" });
+  const option = {
+    filter: "audioonly",
+    highWaterMark: 1048576 / 4,
+  };
 
-  // Set header for audio stream
-  res.setHeader("Content-Type", "audio/mpeg");
-
-  // Pipe the audio stream to the response
-  stream.pipe(res);
+  const stream = ytdl(videoUrl, option);
+  stream.on("error", (err) => {
+    console.log("ytdl error\n", err);
+  });
+  stream.pipe(fs.createWriteStream(`./song_temp_cache/toyIRrgV5U0.mp3`));
 });
 
 app.listen(port, () => {
