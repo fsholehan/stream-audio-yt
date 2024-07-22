@@ -27,6 +27,17 @@ app.get("/audio", (req, res) => {
     });
 });
 
+app.get("/stream", (req, res) => {
+  const videoUrl = "https://www.youtube.com/watch?v=toyIRrgV5U0";
+  const stream = ytdl(videoUrl, { filter: "audioonly" });
+
+  // Set header for audio stream
+  res.setHeader("Content-Type", "audio/mpeg");
+
+  // Pipe the audio stream to the response
+  stream.pipe(res);
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
