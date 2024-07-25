@@ -17,7 +17,7 @@ app.get("/audio", (req, res) => {
   console.log(`Request for video URL: ${videoUrl}`);
 
   res.header("Content-Type", "audio/mpeg");
-  ytdl(videoUrl, { filter: "audioonly", quality: "lowestaudio" })
+  ytdl(videoUrl, { filter: "audioonly" })
     .on("error", (err) => {
       console.error("Streaming error:", err);
       res.status(500).send("Error streaming audio");
