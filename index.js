@@ -3,9 +3,12 @@ const ytdl = require("@distube/ytdl-core");
 const cors = require("cors");
 const fs = require("fs");
 const app = express();
+const { Client } = require("youtubei");
 const port = 3000;
 
 app.use(cors());
+
+const youtube = new Client();
 
 app.get("/audio", (req, res) => {
   const videoUrl = req.query.url;
@@ -41,7 +44,10 @@ app.get("/stream", (req, res) => {
   });
   stream.pipe(fs.createWriteStream(`./song_temp_cache/toyIRrgV5U0.mp3`));
 });
-
+app.get("/audio-url", async (req, res) => {
+  const video = await youtube.getVideo("dQw4w9WgXcQ");
+  console.log(video);
+});
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });

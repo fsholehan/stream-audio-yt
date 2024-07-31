@@ -12,10 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@distube/ytdl-core": "^4.13.5",
+    "@distube/ytdl-core": "^4.13.7",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "youtubei": "^1.5.4"
   }
 }
