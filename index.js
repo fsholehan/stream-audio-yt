@@ -261,7 +261,9 @@ const cookies = [
   },
 ];
 
-const agent = ytdl.createAgent(cookies);
+const uri_proxy = "http://152.26.229.66:9443";
+
+const agent = ytdl.createProxyAgent({ uri: uri_proxy }, cookies);
 
 app.get("/audio", (req, res) => {
   const videoUrl = req.query.url;
