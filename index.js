@@ -1,7 +1,6 @@
 const express = require("express");
 const ytdl = require("@distube/ytdl-core");
 const cors = require("cors");
-const fs = require("fs");
 const app = express();
 const { Client } = require("youtubei");
 const port = 3000;
@@ -274,6 +273,22 @@ app.get("/audio", (req, res) => {
 
   res.header("Content-Type", "audio/mpeg");
   ytdl(videoUrl, { filter: "audioonly", agent })
+    .on("error", (err) => {
+      console.error("Error:", err);
+      res.status(500).send("Error streaming audio");
+    })
+    .pipe(res);
+});
+
+app.get("/audio-local", (req, res) => {
+  const videoUrl = req.query.url; // Ambil URL video dari parameter query
+
+  if (!videoUrl) {
+    return res.status(400).send("Video URL is required");
+  }
+
+  res.header("Content-Type", "audio/mpeg");
+  ytdl(videoUrl, { filter: "audioonly" })
     .on("error", (err) => {
       console.error("Error:", err);
       res.status(500).send("Error streaming audio");
