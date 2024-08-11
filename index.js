@@ -2,12 +2,9 @@ const express = require("express");
 const ytdl = require("@distube/ytdl-core");
 const cors = require("cors");
 const app = express();
-const { Client } = require("youtubei");
 const port = 3000;
 
 app.use(cors());
-
-const youtube = new Client();
 
 const cookies = [
   {
