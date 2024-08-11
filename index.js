@@ -274,16 +274,27 @@ app.get("/audio", (req, res) => {
 
   console.log(`Request for video URL: ${videoUrl}`);
 
-  res.header("Content-Type", "audio/mpeg");
-  ytdl(videoUrl, { filter: "audioonly", agent })
-    .on("error", (err) => {
-      console.error("Streaming error:", err);
-      res.status(500).send("Error streaming audio");
-    })
-    .pipe(res)
-    .on("finish", () => {
-      console.log("Streaming finished successfully");
-    });
+  const stream = ytdl(videoUrl, {
+    filter: "videoandaudio",
+    agent,
+    requestOptions: {
+      headers: {
+        referer: "https://www.youtube.com/",
+      },
+    },
+  });
+
+  res.setHeader("Content-Type", "video/mp4");
+
+  stream.on("data", (chunk) => {
+    // bytes += chunk.length;
+    res.write(chunk);
+  });
+
+  stream.on("end", () => {
+    // res.send(`${formatBytes(bytes)}`);
+    res.end();
+  });
 });
 
 app.listen(port, () => {
