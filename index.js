@@ -278,6 +278,8 @@ app.get("/audio", (req, res) => {
     filter: "videoandaudio",
     agent,
     requestOptions: {
+      headersTimeout: 1000 * 10, // 10 Seconds
+      bodyTimeout: 1000 * 10, // 10 Seconds
       headers: {
         referer: "https://www.youtube.com/",
       },
