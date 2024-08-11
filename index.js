@@ -273,7 +273,7 @@ app.get("/audio", (req, res) => {
   }
 
   res.header("Content-Type", "audio/mpeg");
-  distube(videoUrl, { filter: "audioonly", agent })
+  ytdl(videoUrl, { filter: "audioonly", agent })
     .on("error", (err) => {
       console.error("Error:", err);
       res.status(500).send("Error streaming audio");
