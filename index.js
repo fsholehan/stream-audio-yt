@@ -266,37 +266,19 @@ const uri_proxy = "http://152.26.229.66:9443";
 const agent = ytdl.createProxyAgent({ uri: uri_proxy }, cookies);
 
 app.get("/audio", (req, res) => {
-  const videoUrl = req.query.url;
+  const videoUrl = req.query.url; // Ambil URL video dari parameter query
 
   if (!videoUrl) {
     return res.status(400).send("Video URL is required");
   }
 
-  console.log(`Request for video URL: ${videoUrl}`);
-
-  const stream = ytdl(videoUrl, {
-    filter: "videoandaudio",
-    agent,
-    requestOptions: {
-      headersTimeout: 1000 * 10, // 10 Seconds
-      bodyTimeout: 1000 * 10, // 10 Seconds
-      headers: {
-        referer: "https://www.youtube.com/",
-      },
-    },
-  });
-
-  res.setHeader("Content-Type", "video/mp4");
-
-  stream.on("data", (chunk) => {
-    // bytes += chunk.length;
-    res.write(chunk);
-  });
-
-  stream.on("end", () => {
-    // res.send(`${formatBytes(bytes)}`);
-    res.end();
-  });
+  res.header("Content-Type", "audio/mpeg");
+  distube(videoUrl, { filter: "audioonly", agent })
+    .on("error", (err) => {
+      console.error("Error:", err);
+      res.status(500).send("Error streaming audio");
+    })
+    .pipe(res);
 });
 
 app.listen(port, () => {
