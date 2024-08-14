@@ -1,10 +1,16 @@
-const express = require("express");
-const ytdl = require("@distube/ytdl-core");
-const cors = require("cors");
+import express from "express";
+import ytdl from "@distube/ytdl-core";
+import cors from "cors";
+import fetch from "node-fetch";
+import { Innertube } from "youtubei.js";
 const app = express();
 const port = 3000;
 
 app.use(cors());
+
+const visitor_data = "CgtHUG9CV2Vwd2dwYyiGpvK1BjIKCgJJRBIEGgAgEw%3D%3D";
+const po_token =
+  "MnSe1poeIxntVJ7u03bR8k0uVo21qRNNHwoejmgwRSxo7JvefEFOQM-powp9s_W1G_OMxdlgjSIfACyseLFm1OrWBcT0FWO-TAaHqzgrKTfbPZJ6Y2Nu40iujuZ885Kp0tgBGpiwcF1eDxzFa12HVuqNGSHqQQ==";
 
 const cookies = [
   {
@@ -275,6 +281,48 @@ app.get("/audio", (req, res) => {
       res.status(500).send("Error streaming audio");
     })
     .pipe(res);
+});
+
+app.get("/stream/:videoId", async (req, res) => {
+  const youtube = await Innertube.create({
+    visitor_data,
+  });
+  try {
+    const videoId = req.params.videoId;
+    const pot = req.query.pot || po_token; // Jika `pot` tidak diberikan, gunakan nilai default
+
+    const info = await youtube.getBasicInfo(videoId);
+    const format = info.chooseFormat({ type: "audio", quality: "best" });
+
+    if (!format) {
+      return res.status(404).send("Audio format not found.");
+    }
+
+    let url = format?.decipher(youtube.session.player);
+
+    if (!url) {
+      return res.status(500).send("Failed to get the audio stream URL.");
+    }
+
+    // Tambahkan parameter `pot` ke URL jika diperlukan
+    const urlWithPot = new URL(url);
+    urlWithPot.searchParams.append("pot", pot);
+
+    // Streaming data ke client
+    fetch(urlWithPot.toString())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch audio stream.");
+        }
+        res.setHeader("Content-Type", "audio/mpeg");
+        response.body.pipe(res);
+      })
+      .catch((error) => {
+        res.status(500).send(error.message);
+      });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 app.get("/audio-local", (req, res) => {
