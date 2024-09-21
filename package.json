@@ -18,6 +18,9 @@
     "express": "^4.19.2",
     "node-fetch": "^3.3.2",
     "nodemon": "^3.1.4",
-    "youtubei.js": "^10.3.0"
+    "youtubei.js": "^10.5.0",
+    "@ybd-project/ytdl-core": "^5.1.8",
+    "bgutils-js": "^2.1.0",
+    "jsdom": "^25.0.0"
   }
 }
